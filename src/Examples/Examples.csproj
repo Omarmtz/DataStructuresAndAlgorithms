@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Libraries\DataStructures\DataStructures.csproj" />
     <ProjectReference Include="..\Libraries\SortingAlgorithms\SortingAlgorithms.csproj" />
+    <ProjectReference Include="..\Libraries\GraphAlgorithms\GraphAlgorithms.csproj" />
+    <ProjectReference Include="..\Libraries\StringAlgorithms\StringAlgorithms.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
