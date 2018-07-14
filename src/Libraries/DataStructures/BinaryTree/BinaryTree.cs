@@ -7,8 +7,8 @@ namespace DataStructures.BinaryTree
 {
     public class BinaryTree<T> : IDisposable where T : IComparable
     {
-        private BinaryTreeNode<T> root;
-        private int size;
+        protected BinaryTreeNode<T> root;
+        protected int size;
 
         public BinaryTree()
         {
