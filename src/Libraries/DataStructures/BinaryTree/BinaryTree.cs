@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DataStructures.BinaryTree
 {
-    public class BinaryTree<T> where T : IComparable
+    public class BinaryTree<T> : IDisposable where T : IComparable
     {
         private NodeTree<T> root;
         private int size;
@@ -74,15 +74,42 @@ namespace DataStructures.BinaryTree
         {
 
         }
-           
+
         public void Clear()
         {
+            Dispose();
+        }
 
+        public void Dispose()
+        {
+            this.root = null;
+            size = 0;
         }
 
         public bool Contains(T item)
         {
-            return false;
+            return FindNode(root, item) != null;
+        }
+
+        private NodeTree<T> FindNode(NodeTree<T> node, T item)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+
+            if (node.Data.CompareTo(item) == 1)
+            {
+                return FindNode(node.Left, item);
+            }
+            else if (node.Data.CompareTo(item) == -1)
+            {
+                return FindNode(node.Right, item);
+            }
+            else
+            {
+                return node;
+            }
         }
 
         #region TreeTraversal
