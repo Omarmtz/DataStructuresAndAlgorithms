@@ -33,7 +33,7 @@ namespace DataStructures.BinaryTree
             Insert(root, item);
         }
 
-        private void Insert(NodeTree<T> node, T item)
+        protected void Insert(NodeTree<T> node, T item)
         {
             if (node == null)
             {
@@ -70,11 +70,6 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        public void Remove(T item)
-        {
-
-        }
-
         public void Clear()
         {
             Dispose();
@@ -91,7 +86,105 @@ namespace DataStructures.BinaryTree
             return FindNode(root, item) != null;
         }
 
-        private NodeTree<T> FindNode(NodeTree<T> node, T item)
+        public void Remove(T item)
+        {
+            NodeTree<T> node = FindNode(root, item);
+            if (node == null)
+            {
+                return;
+            }
+
+            if (node.Left == null && node.Right == null)
+            {
+                FirstDeletionCase(node);
+            }
+            else if (node.Left != null && node.Right == null)
+            {
+                SecondDeletionCaseLeft(node);
+            }
+            else if (node.Left == null && node.Right != null)
+            {
+                SecondDeletionCaseRight(node);
+            }
+            else
+            {
+                ThirdDeletionCase(node);
+            }
+            size--;
+        }
+
+        private void ThirdDeletionCase(NodeTree<T> node)
+        {
+            NodeTree<T> nextNode = FindNextNode(node, node.Data);
+            node.Data = nextNode.Data;
+            if (nextNode == nextNode.Parent.Left)
+            {
+                nextNode.Parent.Left = null;
+            }
+            else 
+            {
+                nextNode.Parent.Right = null;
+            }
+        }
+
+        private void SecondDeletionCaseRight(NodeTree<T> node)
+        {
+            if (node == node.Parent.Left)
+            {
+                node.Parent.Left = node.Right;
+            }
+            else
+            {
+                node.Parent.Right = node.Right;
+            }
+        }
+
+        private void SecondDeletionCaseLeft(NodeTree<T> node)
+        {
+            if (node == node.Parent.Left)
+            {
+                node.Parent.Left = node.Left;
+            }
+            else 
+            {
+                node.Parent.Right = node.Left;
+            }
+        }
+
+        private void FirstDeletionCase(NodeTree<T> node)
+        {
+            if (node.Parent != null && node == node.Parent.Left)
+            {
+                node.Parent.Left = null;
+            }
+            else if (node.Parent != null)
+            {
+                node.Parent.Right = null;
+            }
+            else
+            {                
+                root = null;
+            }
+        }
+
+        protected NodeTree<T> FindNextNode(NodeTree<T> node, T item)
+        {
+            if (node.Left == null)
+            {
+                return node;
+            }
+
+            if (node.Data.CompareTo(item) == 0)
+            {
+                return FindNextNode(node.Right, node.Data);
+            }
+            else
+            {
+                return FindNextNode(node.Left, node.Data);
+            }
+        }
+
+        protected NodeTree<T> FindNode(NodeTree<T> node, T item)
         {
             if (node == null)
             {
@@ -110,9 +203,10 @@ namespace DataStructures.BinaryTree
             {
                 return node;
             }
-        }
+        }        
 
         #region TreeTraversal
+
         public List<T> GetPreorderList()
         {
             List<T> list = new List<T>(size);
@@ -168,9 +262,11 @@ namespace DataStructures.BinaryTree
             PostOrderList(node.Right, list);
             list.Add(node.Data);
         }
+
         #endregion
 
         #region Min,Max and Range
+
         public T Max()
         {
             return Max(root);
@@ -203,6 +299,7 @@ namespace DataStructures.BinaryTree
         {
             return null;
         }
+
         #endregion
 
     }

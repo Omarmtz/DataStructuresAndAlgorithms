@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DataStructures.NodeDefinitions
 {
-    internal class NodeTree<T>
+    public class NodeTree<T>
     {
         public NodeTree<T> Parent { get; set; }
         public NodeTree<T> Left{ get; set; }
