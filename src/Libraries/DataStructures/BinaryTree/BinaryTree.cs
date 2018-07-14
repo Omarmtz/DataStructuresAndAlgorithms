@@ -16,12 +16,17 @@ namespace DataStructures.BinaryTree
             size = 0;
         }
 
+        public bool IsEmpty()
+        {
+            return size == 0;
+        }
+
         public int Count
         {
             get { return size; }
         }
 
-        public void Insert(T item)
+        public virtual void Insert(T item)
         {
             if (root == null)
             {
@@ -33,7 +38,7 @@ namespace DataStructures.BinaryTree
             Insert(root, item);
         }
 
-        protected void Insert(NodeTree<T> node, T item)
+        protected virtual void Insert(NodeTree<T> node, T item)
         {
             if (node == null)
             {
@@ -70,12 +75,12 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             Dispose();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.root = null;
             size = 0;
@@ -86,7 +91,7 @@ namespace DataStructures.BinaryTree
             return FindNode(root, item) != null;
         }
 
-        public void Remove(T item)
+        public virtual void Remove(T item)
         {
             NodeTree<T> node = FindNode(root, item);
             if (node == null)
@@ -115,7 +120,7 @@ namespace DataStructures.BinaryTree
 
         private void ThirdDeletionCase(NodeTree<T> node)
         {
-            NodeTree<T> nextNode = FindNextNode(node, node.Data);
+            NodeTree<T> nextNode = FindNextNode(node);
             node.Data = nextNode.Data;
             if (nextNode == nextNode.Parent.Left)
             {
@@ -167,21 +172,42 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        protected NodeTree<T> FindNextNode(NodeTree<T> node, T item)
+        protected NodeTree<T> FindNextNode(NodeTree<T> node)
         {
-            if (node.Left == null)
+            if (node.Right != null)
             {
-                return node;
-            }
-
-            if (node.Data.CompareTo(item) == 0)
-            {
-                return FindNextNode(node.Right, node.Data);
+                return LeftDescendant(node.Right);
             }
             else
             {
-                return FindNextNode(node.Left, node.Data);
+                return RightAncestor(node);
             }
+        }
+
+        private NodeTree<T> RightAncestor(NodeTree<T> node)
+        {
+            if(node.Parent == null)
+            {
+                return null;
+            }
+            if(node.Data.CompareTo(node.Parent.Data) == -1)
+            {
+                return node.Parent;
+            }
+            return RightAncestor(node.Parent);
+        }
+
+        private NodeTree<T> LeftDescendant(NodeTree<T> node)
+        {
+            if(node == null)
+            {
+                return null;
+            }
+            if(node.Left == null)
+            {
+                return node;
+            }
+            return LeftDescendant(node.Left);
         }
 
         protected NodeTree<T> FindNode(NodeTree<T> node, T item)
@@ -263,7 +289,7 @@ namespace DataStructures.BinaryTree
             list.Add(node.Data);
         }
 
-        public T this[int index]
+        public virtual T this[int index]
         {
             get
             {
@@ -305,7 +331,45 @@ namespace DataStructures.BinaryTree
 
         public List<T> GetRange(T min, T max)
         {
-            return null;
+            var rangeList = new List<T>();
+
+            if(IsEmpty())
+            {
+                return rangeList;
+            }
+
+            var nodeTmp = FindNextCloseNode(root, min);
+
+            while(nodeTmp != null && nodeTmp.Data.CompareTo(max) != 1)
+            {
+                rangeList.Add(nodeTmp.Data);
+                nodeTmp = FindNextNode(nodeTmp);
+            }
+
+            return rangeList;
+        }
+
+        private NodeTree<T> FindNextCloseNode(NodeTree<T> node, T item)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+
+            if (node.Data.CompareTo(item) == 1)
+            {
+                var nodeCompare = FindNextCloseNode(node.Left, item);
+                return nodeCompare ?? node;
+            }
+            else if (node.Data.CompareTo(item) == -1)
+            {
+                var nodeCompare = FindNextCloseNode(node.Right, item);
+                return nodeCompare ?? node;
+            }
+            else
+            {
+                return node;
+            }
         }
 
         #endregion
