@@ -121,7 +121,7 @@ namespace DataStructures.BinaryTree
             {
                 nextNode.Parent.Left = null;
             }
-            else 
+            else
             {
                 nextNode.Parent.Right = null;
             }
@@ -145,7 +145,7 @@ namespace DataStructures.BinaryTree
             {
                 node.Parent.Left = node.Left;
             }
-            else 
+            else
             {
                 node.Parent.Right = node.Left;
             }
@@ -162,7 +162,7 @@ namespace DataStructures.BinaryTree
                 node.Parent.Right = null;
             }
             else
-            {                
+            {
                 root = null;
             }
         }
@@ -203,7 +203,7 @@ namespace DataStructures.BinaryTree
             {
                 return node;
             }
-        }        
+        }
 
         #region TreeTraversal
 
@@ -261,6 +261,14 @@ namespace DataStructures.BinaryTree
             PostOrderList(node.Left, list);
             PostOrderList(node.Right, list);
             list.Add(node.Data);
+        }
+
+        public T this[int index]
+        {
+            get
+            {
+                return GetInOrderList()[index];
+            }            
         }
 
         #endregion
