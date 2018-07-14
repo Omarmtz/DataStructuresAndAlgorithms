@@ -4,16 +4,16 @@ using System.Text;
 
 namespace DataStructures.NodeDefinitions
 {
-    public class NodeTree<T>
+    public class BinaryTreeNode<T>
     {
-        public NodeTree<T> Parent { get; set; }
-        public NodeTree<T> Left{ get; set; }
-        public NodeTree<T> Right { get; set; }
+        public BinaryTreeNode<T> Parent { get; set; }
+        public BinaryTreeNode<T> Left{ get; set; }
+        public BinaryTreeNode<T> Right { get; set; }
 
         public int Height { get; set; }
         public T Data { get; set; }
 
-        public NodeTree(T item)
+        public BinaryTreeNode(T item)
         {
             Height = 0;
             Data = item;

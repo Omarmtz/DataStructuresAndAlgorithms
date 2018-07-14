@@ -7,7 +7,7 @@ namespace DataStructures.BinaryTree
 {
     public class BinaryTree<T> : IDisposable where T : IComparable
     {
-        private NodeTree<T> root;
+        private BinaryTreeNode<T> root;
         private int size;
 
         public BinaryTree()
@@ -30,7 +30,7 @@ namespace DataStructures.BinaryTree
         {
             if (root == null)
             {
-                root = new NodeTree<T>(item);
+                root = new BinaryTreeNode<T>(item);
                 size++;
                 return;
             }
@@ -38,7 +38,7 @@ namespace DataStructures.BinaryTree
             Insert(root, item);
         }
 
-        protected virtual void Insert(NodeTree<T> node, T item)
+        protected virtual void Insert(BinaryTreeNode<T> node, T item)
         {
             if (node == null)
             {
@@ -51,7 +51,7 @@ namespace DataStructures.BinaryTree
 
                 if (node.Left == null)
                 {
-                    NodeTree<T> newNode = new NodeTree<T>(item);
+                    BinaryTreeNode<T> newNode = new BinaryTreeNode<T>(item);
                     newNode.Parent = node;
                     node.Left = newNode;
                     size++;
@@ -63,7 +63,7 @@ namespace DataStructures.BinaryTree
 
                 if (node.Right == null)
                 {
-                    NodeTree<T> newNode = new NodeTree<T>(item);
+                    BinaryTreeNode<T> newNode = new BinaryTreeNode<T>(item);
                     newNode.Parent = node;
                     node.Right = newNode;
                     size++;
@@ -93,7 +93,7 @@ namespace DataStructures.BinaryTree
 
         public virtual void Remove(T item)
         {
-            NodeTree<T> node = FindNode(root, item);
+            BinaryTreeNode<T> node = FindNode(root, item);
             if (node == null)
             {
                 return;
@@ -118,9 +118,9 @@ namespace DataStructures.BinaryTree
             size--;
         }
 
-        private void ThirdDeletionCase(NodeTree<T> node)
+        private void ThirdDeletionCase(BinaryTreeNode<T> node)
         {
-            NodeTree<T> nextNode = FindNextNode(node);
+            BinaryTreeNode<T> nextNode = FindNextNode(node);
             node.Data = nextNode.Data;
             if (nextNode == nextNode.Parent.Left)
             {
@@ -132,7 +132,7 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        private void SecondDeletionCaseRight(NodeTree<T> node)
+        private void SecondDeletionCaseRight(BinaryTreeNode<T> node)
         {
             if (node == node.Parent.Left)
             {
@@ -144,7 +144,7 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        private void SecondDeletionCaseLeft(NodeTree<T> node)
+        private void SecondDeletionCaseLeft(BinaryTreeNode<T> node)
         {
             if (node == node.Parent.Left)
             {
@@ -156,7 +156,7 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        private void FirstDeletionCase(NodeTree<T> node)
+        private void FirstDeletionCase(BinaryTreeNode<T> node)
         {
             if (node.Parent != null && node == node.Parent.Left)
             {
@@ -172,7 +172,7 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        protected NodeTree<T> FindNextNode(NodeTree<T> node)
+        protected BinaryTreeNode<T> FindNextNode(BinaryTreeNode<T> node)
         {
             if (node.Right != null)
             {
@@ -184,7 +184,7 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        private NodeTree<T> RightAncestor(NodeTree<T> node)
+        private BinaryTreeNode<T> RightAncestor(BinaryTreeNode<T> node)
         {
             if(node.Parent == null)
             {
@@ -197,7 +197,7 @@ namespace DataStructures.BinaryTree
             return RightAncestor(node.Parent);
         }
 
-        private NodeTree<T> LeftDescendant(NodeTree<T> node)
+        private BinaryTreeNode<T> LeftDescendant(BinaryTreeNode<T> node)
         {
             if(node == null)
             {
@@ -210,7 +210,7 @@ namespace DataStructures.BinaryTree
             return LeftDescendant(node.Left);
         }
 
-        protected NodeTree<T> FindNode(NodeTree<T> node, T item)
+        protected BinaryTreeNode<T> FindNode(BinaryTreeNode<T> node, T item)
         {
             if (node == null)
             {
@@ -240,7 +240,7 @@ namespace DataStructures.BinaryTree
             return list;
         }
 
-        private void PreOrderList(NodeTree<T> node, List<T> list)
+        private void PreOrderList(BinaryTreeNode<T> node, List<T> list)
         {
             if (node == null)
             {
@@ -258,7 +258,7 @@ namespace DataStructures.BinaryTree
             return list;
         }
 
-        private void InOrderList(NodeTree<T> node, List<T> list)
+        private void InOrderList(BinaryTreeNode<T> node, List<T> list)
         {
             if (node == null)
             {
@@ -277,7 +277,7 @@ namespace DataStructures.BinaryTree
             return list;
         }
 
-        private void PostOrderList(NodeTree<T> node, List<T> list)
+        private void PostOrderList(BinaryTreeNode<T> node, List<T> list)
         {
             if (node == null)
             {
@@ -306,7 +306,7 @@ namespace DataStructures.BinaryTree
             return Max(root);
         }
 
-        private T Max(NodeTree<T> root)
+        private T Max(BinaryTreeNode<T> root)
         {
             if (root.Right == null)
             {
@@ -320,7 +320,7 @@ namespace DataStructures.BinaryTree
             return Min(root);
         }
 
-        private T Min(NodeTree<T> root)
+        private T Min(BinaryTreeNode<T> root)
         {
             if (root.Left == null)
             {
@@ -349,7 +349,7 @@ namespace DataStructures.BinaryTree
             return rangeList;
         }
 
-        private NodeTree<T> FindNextCloseNode(NodeTree<T> node, T item)
+        private BinaryTreeNode<T> FindNextCloseNode(BinaryTreeNode<T> node, T item)
         {
             if (node == null)
             {
