@@ -19,9 +19,9 @@ namespace DataStructures.AVLTree
             base.Insert(item);
 
             var newNode = FindNode(root, item);
-            CalculateHeight(newNode);
+            AdjustHeight(newNode);
 
-            BalanceTree(newNode);            
+            Rebalance(newNode);
         }
 
         public override void Remove(T item)
@@ -29,44 +29,73 @@ namespace DataStructures.AVLTree
             base.Remove(item);
         }
 
-        protected void CalculateHeight(BinaryTreeNode<T> node)
+        protected void AdjustHeight(BinaryTreeNode<T> node)
         {
             if (node == null)
             {
                 return;
             }
-
-            if (node.Left != null && node.Right != null)
-            {
-                node.Height = Math.Max(node.Left.Height, node.Right.Height) + 1;
-            }
-            else if (node.Left != null && node.Right == null)
-            {
-                node.Height = node.Left.Height + 1;
-            }
-            else if (node.Left == null && node.Right != null)
-            {
-                node.Height = node.Right.Height + 1;
-            }
-            CalculateHeight(node.Parent);
+            node.Height = Math.Max(node.LeftHeight, node.RightHeight) + 1;
+            AdjustHeight(node.Parent);
         }
 
-        protected void BalanceTree(BinaryTreeNode<T> node)
+        protected void Rebalance(BinaryTreeNode<T> node)
         {
             if (node == null)
             {
                 return;
             }
-            BalanceTree(node.Parent);
+
+            if (!IsBalancedNode(node))
+            {
+                if (node.RightHeight > node.LeftHeight)
+                {
+                    RebalanceLeft(node);
+                }
+                else if (node.LeftHeight > node.RightHeight)
+                {
+                    RebalanceRight(node);
+                }
+            }
+
+            if (node.Parent != null)
+            {
+                var parentNode = node.Parent;
+                Rebalance(parentNode);
+            }
+        }
+
+        private void RebalanceRight(BinaryTreeNode<T> node)
+        {
+            if (node.Left.Right != null)
+            {
+                RotateLeft(node.Left);
+            }
+            RotateRight(node);
+        }
+
+        private void RebalanceLeft(BinaryTreeNode<T> node)
+        {
+            if (node.Right.Left != null)
+            {
+                RotateRight(node.Right);
+            }
+            RotateLeft(node);
+        }
+
+        private void RotateLeft(BinaryTreeNode<T> node)
+        {
+
+        }
+
+        private void RotateRight(BinaryTreeNode<T> node)
+        {
+
         }
 
         private bool IsBalancedNode(BinaryTreeNode<T> node)
         {
-            var leftHeight = (node.Left == null) ? 0 : node.Left.Height;
-            var rightHeight = (node.Right == null) ? 0 : node.Right.Height;
-
-            var balanceFactor = leftHeight - rightHeight;
-
+            var balanceFactor = node.LeftHeight - node.RightHeight;
             return balanceFactor >= -1 && balanceFactor <= 1;
         }
     }
