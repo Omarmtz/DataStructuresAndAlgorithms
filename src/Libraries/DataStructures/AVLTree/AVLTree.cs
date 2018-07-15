@@ -17,25 +17,13 @@ namespace DataStructures.AVLTree
         public override void Insert(T item)
         {
             base.Insert(item);
-
-            var newNode = FindNode(root, item);
-            AdjustHeight(newNode);
+            var newNode = FindNode(root, item);            
             Rebalance(newNode);
         }
 
         public override void Remove(T item)
         {
             base.Remove(item);
-        }
-
-        protected void AdjustHeight(BinaryTreeNode<T> node)
-        {
-            if (node == null)
-            {
-                return;
-            }
-            node.Height = Math.Max(node.LeftHeight, node.RightHeight) + 1;
-            AdjustHeight(node.Parent);
         }
 
         protected void Rebalance(BinaryTreeNode<T> node)

@@ -55,6 +55,7 @@ namespace DataStructures.BinaryTree
                     newNode.Parent = node;
                     node.Left = newNode;
                     size++;
+                    AdjustHeight(newNode);
                 }
             }
             else if (node.Data.CompareTo(item) == -1)
@@ -67,12 +68,23 @@ namespace DataStructures.BinaryTree
                     newNode.Parent = node;
                     node.Right = newNode;
                     size++;
+                    AdjustHeight(newNode);
                 }
             }
             else
             {
                 throw new Exception("Cannot have duplicated values");
             }
+        }
+
+        protected void AdjustHeight(BinaryTreeNode<T> node)
+        {
+            if (node == null)
+            {
+                return;
+            }
+            node.Height = Math.Max(node.LeftHeight, node.RightHeight) + 1;
+            AdjustHeight(node.Parent);
         }
 
         public virtual void Clear()
