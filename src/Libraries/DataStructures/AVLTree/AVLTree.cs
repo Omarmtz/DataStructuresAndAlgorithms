@@ -20,7 +20,6 @@ namespace DataStructures.AVLTree
 
             var newNode = FindNode(root, item);
             AdjustHeight(newNode);
-
             Rebalance(newNode);
         }
 
@@ -46,22 +45,16 @@ namespace DataStructures.AVLTree
                 return;
             }
 
-            if (!IsBalancedNode(node))
+            if (node.LeftHeight > node.RightHeight + 1)
             {
-                if (node.RightHeight > node.LeftHeight)
-                {
-                    RebalanceLeft(node);
-                }
-                else if (node.LeftHeight > node.RightHeight)
-                {
-                    RebalanceRight(node);
-                }
+                RebalanceRight(node);
+            }
+            else if (node.RightHeight > node.LeftHeight + 1)
+            {
+                RebalanceLeft(node);
             }
 
-            if (node.Parent != null)
-            {                
-                Rebalance(node.Parent);
-            }
+            Rebalance(node.Parent);
         }
 
         private void RebalanceRight(BinaryTreeNode<T> node)
@@ -69,8 +62,6 @@ namespace DataStructures.AVLTree
             if (node.Left.Right != null)
             {
                 RotateLeft(node.Left);
-                node.Left = node.Left.Parent;
-                AdjustHeight(node.Left);
             }
             RotateRight(node);
         }
@@ -78,74 +69,78 @@ namespace DataStructures.AVLTree
         private void RebalanceLeft(BinaryTreeNode<T> node)
         {
             if (node.Right.Left != null)
-            {                
+            {
                 RotateRight(node.Right);
-                node.Right = node.Right.Parent;
-                AdjustHeight(node.Right);
             }
             RotateLeft(node);
         }
 
-        private void RotateLeft(BinaryTreeNode<T> node)
+        private void RotateLeft(BinaryTreeNode<T> A)
         {
-            node.Right.Left = node;
-            node.Right.Parent = node.Parent;
-
-            node.Parent = node.Right;
-            node.Right = null;
-            
-            AdjustHeight(node);
-
-            if (node == root)
+            var B = A.Right;
+            B.Parent = A.Parent;
+            if (B.Parent != null)
             {
-                root = node.Parent;
+                if (B.Parent != null && B.Parent.Left == A)
+                {
+                    B.Parent.Left = B;
+                }
+                else if (B.Parent != null && B.Parent.Right == A)
+                {
+                    B.Parent.Right = B;
+                }
             }
-            else
+
+            A.Right = B.Left;
+            if (A.Right != null)
             {
-                if (node.Parent != null && node.Parent.Left == node)
-                {
-                    node.Parent.Left = node;
-                }
-                else if (node.Parent != null && node.Parent.Right == node)
-                {
-                    node.Parent.Right = node;
-                }
-                node = node.Parent;
-            }            
-        }
-
-        private void RotateRight(BinaryTreeNode<T> node)
-        {
-            node.Left.Right = node;
-            node.Left.Parent = node.Parent;
-
-            node.Parent = node.Left;
-            node.Left = null;
-
-            AdjustHeight(node);
-
-            if (node == root)
-            {
-                root = node.Parent;
+                A.Right.Parent = A;
             }
-            else
-            {                
-                if(node.Parent != null && node.Parent.Left == node)
-                {
-                    node.Parent.Left = node;
-                }
-                else if (node.Parent != null && node.Parent.Right == node)
-                {
-                    node.Parent.Right = node;
-                }
-                node = node.Parent;
+
+            B.Left = A;
+            A.Parent = B;
+
+            AdjustHeight(A);
+            AdjustHeight(A.Right);
+
+            if (B.Parent == null)
+            {
+                root = B;
             }
         }
 
-        private bool IsBalancedNode(BinaryTreeNode<T> node)
+        private void RotateRight(BinaryTreeNode<T> A)
         {
-            var balanceFactor = node.LeftHeight - node.RightHeight;
-            return balanceFactor >= -1 && balanceFactor <= 1;
+            var B = A.Left;
+            B.Parent = A.Parent;
+            if (B.Parent != null)
+            {
+                if (B.Parent != null && B.Parent.Left == A)
+                {
+                    B.Parent.Left = B;
+                }
+                else if (B.Parent != null && B.Parent.Right == A)
+                {
+                    B.Parent.Right = B;
+                }
+            }
+
+            A.Left = B.Right;
+            if (A.Left != null)
+            {
+                A.Left.Parent = A;
+            }
+
+            B.Right = A;
+            A.Parent = B;
+
+            AdjustHeight(A);
+            AdjustHeight(A.Left);
+
+            if (B.Parent == null)
+            {
+                root = B;
+            }
         }
     }
 }

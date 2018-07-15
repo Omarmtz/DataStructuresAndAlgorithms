@@ -15,6 +15,7 @@ namespace DataStructures.NodeDefinitions
 
         public BinaryTreeNode(T item)
         {
+            Height = 1;
             Data = item;
         }
 
