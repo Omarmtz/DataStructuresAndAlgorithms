@@ -59,7 +59,7 @@ namespace DataStructures.AVLTree
 
         private void RebalanceRight(BinaryTreeNode<T> node)
         {
-            if (node.Left.Right != null)
+            if (node.Left?.RightHeight > node.Left?.LeftHeight)
             {
                 RotateLeft(node.Left);
             }
@@ -68,7 +68,7 @@ namespace DataStructures.AVLTree
 
         private void RebalanceLeft(BinaryTreeNode<T> node)
         {
-            if (node.Right.Left != null)
+            if (node.Left?.LeftHeight > node.Left?.RightHeight)
             {
                 RotateRight(node.Right);
             }
