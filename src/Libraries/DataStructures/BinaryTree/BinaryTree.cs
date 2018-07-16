@@ -26,6 +26,83 @@ namespace DataStructures.BinaryTree
             get { return size; }
         }
 
+        public virtual void Clear()
+        {
+            Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            this.root = null;
+            size = 0;
+        }
+
+        public bool Contains(T item)
+        {
+            return FindNode(root, item) != null;
+        }
+
+        protected BinaryTreeNode<T> FindNextNode(BinaryTreeNode<T> node)
+        {
+            if (node.Right != null)
+            {
+                return LeftDescendant(node.Right);
+            }
+            else
+            {
+                return RightAncestor(node);
+            }
+        }
+
+        private BinaryTreeNode<T> RightAncestor(BinaryTreeNode<T> node)
+        {
+            if (node.Parent == null)
+            {
+                return null;
+            }
+            if (node.Data.CompareTo(node.Parent.Data) == -1)
+            {
+                return node.Parent;
+            }
+            return RightAncestor(node.Parent);
+        }
+
+        private BinaryTreeNode<T> LeftDescendant(BinaryTreeNode<T> node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+            if (node.Left == null)
+            {
+                return node;
+            }
+            return LeftDescendant(node.Left);
+        }
+
+        protected BinaryTreeNode<T> FindNode(BinaryTreeNode<T> node, T item)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+
+            if (node.Data.CompareTo(item) == 1)
+            {
+                return FindNode(node.Left, item);
+            }
+            else if (node.Data.CompareTo(item) == -1)
+            {
+                return FindNode(node.Right, item);
+            }
+            else
+            {
+                return node;
+            }
+        }
+
+        #region Insertion
+
         public virtual void Insert(T item)
         {
             if (root == null)
@@ -36,7 +113,7 @@ namespace DataStructures.BinaryTree
             }
 
             Insert(root, item);
-        }
+        }        
 
         protected virtual void Insert(BinaryTreeNode<T> node, T item)
         {
@@ -87,21 +164,9 @@ namespace DataStructures.BinaryTree
             AdjustHeight(node.Parent);
         }
 
-        public virtual void Clear()
-        {
-            Dispose();
-        }
+        #endregion
 
-        public virtual void Dispose()
-        {
-            this.root = null;
-            size = 0;
-        }
-
-        public bool Contains(T item)
-        {
-            return FindNode(root, item) != null;
-        }
+        #region Deletion
 
         public virtual void Remove(T item)
         {
@@ -109,139 +174,92 @@ namespace DataStructures.BinaryTree
             if (node == null)
             {
                 return;
-            }
+            }                
 
-            if (node.Left == null && node.Right == null)
+            if (NodeHasNoChildrens(node))
             {
-                FirstDeletionCase(node);
+                DeleteCaseNoChildrens(node);
             }
-            else if (node.Left != null && node.Right == null)
+            else if (NodeHasOneChildren(node))
             {
-                SecondDeletionCaseLeft(node);
+                DeleteCaseOneChildren(node);
             }
-            else if (node.Left == null && node.Right != null)
+            else if (NodeHasTwoChildrens(node))
             {
-                SecondDeletionCaseRight(node);
-            }
-            else
-            {
-                ThirdDeletionCase(node);
+                DeleteCaseTwoChildrens(node);
             }
             size--;
         }
 
-        private void ThirdDeletionCase(BinaryTreeNode<T> node)
+        private void DeleteCaseTwoChildrens(BinaryTreeNode<T> node)
         {
-            BinaryTreeNode<T> nextNode = FindNextNode(node);
+            var nextNode = FindNextNode(node);
+
             node.Data = nextNode.Data;
-            if (nextNode == nextNode.Parent.Left)
+            
+            if (nextNode.Parent != null && nextNode.Parent.Left == nextNode)
             {
                 nextNode.Parent.Left = null;
             }
-            else
+            else if (nextNode.Parent != null && nextNode.Parent.Right == nextNode)
             {
                 nextNode.Parent.Right = null;
             }
+            AdjustHeight(nextNode.Parent);
         }
 
-        private void SecondDeletionCaseRight(BinaryTreeNode<T> node)
+        private void DeleteCaseOneChildren(BinaryTreeNode<T> node)
         {
-            if (node == node.Parent.Left)
+            if (node.Left != null)
             {
-                node.Parent.Left = node.Right;
+                node.Data = node.Left.Data;
+                node.Right = node.Left.Right;
+                node.Left = node.Left.Left;
+                node.Left = null;
             }
-            else
+            else if (node.Right != null)
             {
-                node.Parent.Right = node.Right;
+                node.Data = node.Right.Data;
+                node.Left = node.Right.Left;
+                node.Right = node.Right.Right;
+                node.Right = null;
             }
+            AdjustHeight(node);
         }
 
-        private void SecondDeletionCaseLeft(BinaryTreeNode<T> node)
+        private void DeleteCaseNoChildrens(BinaryTreeNode<T> node)
         {
-            if (node == node.Parent.Left)
-            {
-                node.Parent.Left = node.Left;
-            }
-            else
-            {
-                node.Parent.Right = node.Left;
-            }
-        }
-
-        private void FirstDeletionCase(BinaryTreeNode<T> node)
-        {
-            if (node.Parent != null && node == node.Parent.Left)
+            if (node.Parent != null && node.Parent.Left == node)
             {
                 node.Parent.Left = null;
             }
-            else if (node.Parent != null)
+            else if (node.Parent != null && node.Parent.Right == node)
             {
                 node.Parent.Right = null;
             }
-            else
+            AdjustHeight(node.Parent);
+            if (root == node)
             {
                 root = null;
             }
         }
 
-        protected BinaryTreeNode<T> FindNextNode(BinaryTreeNode<T> node)
+        private bool NodeHasTwoChildrens(BinaryTreeNode<T> node)
         {
-            if (node.Right != null)
-            {
-                return LeftDescendant(node.Right);
-            }
-            else
-            {
-                return RightAncestor(node);
-            }
+            return (node.Left != null && node.Right != null);
         }
 
-        private BinaryTreeNode<T> RightAncestor(BinaryTreeNode<T> node)
+        private bool NodeHasOneChildren(BinaryTreeNode<T> node)
         {
-            if(node.Parent == null)
-            {
-                return null;
-            }
-            if(node.Data.CompareTo(node.Parent.Data) == -1)
-            {
-                return node.Parent;
-            }
-            return RightAncestor(node.Parent);
+            return (node.Left == null && node.Right != null) || (node.Left != null && node.Right == null);
         }
 
-        private BinaryTreeNode<T> LeftDescendant(BinaryTreeNode<T> node)
+        private bool NodeHasNoChildrens(BinaryTreeNode<T> node)
         {
-            if(node == null)
-            {
-                return null;
-            }
-            if(node.Left == null)
-            {
-                return node;
-            }
-            return LeftDescendant(node.Left);
+            return node.Left == null && node.Right == null;
         }
 
-        protected BinaryTreeNode<T> FindNode(BinaryTreeNode<T> node, T item)
-        {
-            if (node == null)
-            {
-                return null;
-            }
-
-            if (node.Data.CompareTo(item) == 1)
-            {
-                return FindNode(node.Left, item);
-            }
-            else if (node.Data.CompareTo(item) == -1)
-            {
-                return FindNode(node.Right, item);
-            }
-            else
-            {
-                return node;
-            }
-        }
+        #endregion        
 
         #region TreeTraversal
 
@@ -306,7 +324,7 @@ namespace DataStructures.BinaryTree
             get
             {
                 return GetInOrderList()[index];
-            }            
+            }
         }
 
         #endregion
@@ -345,14 +363,14 @@ namespace DataStructures.BinaryTree
         {
             var rangeList = new List<T>();
 
-            if(IsEmpty())
+            if (IsEmpty())
             {
                 return rangeList;
             }
 
             var nodeTmp = FindNextCloseNode(root, min);
 
-            while(nodeTmp != null && nodeTmp.Data.CompareTo(max) != 1)
+            while (nodeTmp != null && nodeTmp.Data.CompareTo(max) != 1)
             {
                 rangeList.Add(nodeTmp.Data);
                 nodeTmp = FindNextNode(nodeTmp);
