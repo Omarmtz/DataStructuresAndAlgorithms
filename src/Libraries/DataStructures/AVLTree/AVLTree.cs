@@ -63,71 +63,71 @@ namespace DataStructures.AVLTree
             RotateLeft(node);
         }
 
-        private void RotateLeft(BinaryTreeNode<T> A)
+        private void RotateLeft(BinaryTreeNode<T> node)
         {
-            var B = A.Right;
-            B.Parent = A.Parent;
-            if (B.Parent != null)
+            var rightNode = node.Right;
+            rightNode.Parent = node.Parent;
+            if (rightNode.Parent != null)
             {
-                if (B.Parent != null && B.Parent.Left == A)
+                if (rightNode.Parent != null && rightNode.Parent.Left == node)
                 {
-                    B.Parent.Left = B;
+                    rightNode.Parent.Left = rightNode;
                 }
-                else if (B.Parent != null && B.Parent.Right == A)
+                else if (rightNode.Parent != null && rightNode.Parent.Right == node)
                 {
-                    B.Parent.Right = B;
+                    rightNode.Parent.Right = rightNode;
                 }
             }
 
-            A.Right = B.Left;
-            if (A.Right != null)
+            node.Right = rightNode.Left;
+            if (node.Right != null)
             {
-                A.Right.Parent = A;
+                node.Right.Parent = node;
             }
 
-            B.Left = A;
-            A.Parent = B;
+            rightNode.Left = node;
+            node.Parent = rightNode;
 
-            AdjustHeight(A);
-            AdjustHeight(A.Right);
+            AdjustHeight(node);
+            AdjustHeight(node.Right);
 
-            if (B.Parent == null)
+            if (rightNode.Parent == null)
             {
-                root = B;
+                root = rightNode;
             }
         }
 
-        private void RotateRight(BinaryTreeNode<T> A)
+        private void RotateRight(BinaryTreeNode<T> node)
         {
-            var B = A.Left;
-            B.Parent = A.Parent;
-            if (B.Parent != null)
+            var leftNode = node.Left;
+            leftNode.Parent = node.Parent;
+            if (leftNode.Parent != null)
             {
-                if (B.Parent != null && B.Parent.Left == A)
+                if (leftNode.Parent != null && leftNode.Parent.Left == node)
                 {
-                    B.Parent.Left = B;
+                    leftNode.Parent.Left = leftNode;
                 }
-                else if (B.Parent != null && B.Parent.Right == A)
+                else if (leftNode.Parent != null && leftNode.Parent.Right == node)
                 {
-                    B.Parent.Right = B;
+                    leftNode.Parent.Right = leftNode;
                 }
             }
 
-            A.Left = B.Right;
-            if (A.Left != null)
+            node.Left = leftNode.Right;
+            if (node.Left != null)
             {
-                A.Left.Parent = A;
+                node.Left.Parent = node;
             }
 
-            B.Right = A;
-            A.Parent = B;
+            leftNode.Right = node;
+            node.Parent = leftNode;
 
-            AdjustHeight(A);
-            AdjustHeight(A.Left);
+            AdjustHeight(node);
+            AdjustHeight(node.Left);
 
-            if (B.Parent == null)
+            if (leftNode.Parent == null)
             {
-                root = B;
+                root = leftNode;
             }
         }
     }
