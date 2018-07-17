@@ -113,7 +113,7 @@ namespace DataStructures.BinaryTree
             }
 
             Insert(root, item);
-        }        
+        }
 
         protected virtual void Insert(BinaryTreeNode<T> node, T item)
         {
@@ -171,32 +171,39 @@ namespace DataStructures.BinaryTree
         public virtual void Remove(T item)
         {
             BinaryTreeNode<T> node = FindNode(root, item);
+            Remove(node);                       
+        }
+
+        protected virtual BinaryTreeNode<T> Remove(BinaryTreeNode<T> node)
+        {
+            BinaryTreeNode<T> replacedNode = null;
             if (node == null)
             {
-                return;
-            }                
+                return replacedNode;
+            }
 
             if (NodeHasNoChildrens(node))
             {
-                DeleteCaseNoChildrens(node);
+                replacedNode = DeleteCaseNoChildrens(node);
             }
             else if (NodeHasOneChildren(node))
             {
-                DeleteCaseOneChildren(node);
+                replacedNode = DeleteCaseOneChildren(node);
             }
             else if (NodeHasTwoChildrens(node))
             {
-                DeleteCaseTwoChildrens(node);
+                replacedNode = DeleteCaseTwoChildrens(node);
             }
             size--;
+            return replacedNode;
         }
 
-        private void DeleteCaseTwoChildrens(BinaryTreeNode<T> node)
+        private BinaryTreeNode<T> DeleteCaseTwoChildrens(BinaryTreeNode<T> node)
         {
             var nextNode = FindNextNode(node);
 
             node.Data = nextNode.Data;
-            
+
             if (nextNode.Parent != null && nextNode.Parent.Left == nextNode)
             {
                 nextNode.Parent.Left = null;
@@ -206,9 +213,10 @@ namespace DataStructures.BinaryTree
                 nextNode.Parent.Right = null;
             }
             AdjustHeight(nextNode.Parent);
+            return nextNode.Parent;
         }
 
-        private void DeleteCaseOneChildren(BinaryTreeNode<T> node)
+        private BinaryTreeNode<T> DeleteCaseOneChildren(BinaryTreeNode<T> node)
         {
             if (node.Left != null)
             {
@@ -225,9 +233,11 @@ namespace DataStructures.BinaryTree
                 node.Right = null;
             }
             AdjustHeight(node);
+
+            return node;
         }
 
-        private void DeleteCaseNoChildrens(BinaryTreeNode<T> node)
+        private BinaryTreeNode<T> DeleteCaseNoChildrens(BinaryTreeNode<T> node)
         {
             if (node.Parent != null && node.Parent.Left == node)
             {
@@ -242,6 +252,7 @@ namespace DataStructures.BinaryTree
             {
                 root = null;
             }
+            return node.Parent;
         }
 
         private bool NodeHasTwoChildrens(BinaryTreeNode<T> node)

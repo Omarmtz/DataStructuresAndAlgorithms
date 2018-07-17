@@ -23,7 +23,9 @@ namespace DataStructures.AVLTree
 
         public override void Remove(T item)
         {
-            base.Remove(item);
+            BinaryTreeNode<T> node = FindNode(root, item);
+            var referenceNode = Remove(node);
+            Rebalance(referenceNode);
         }
 
         protected void Rebalance(BinaryTreeNode<T> node)
