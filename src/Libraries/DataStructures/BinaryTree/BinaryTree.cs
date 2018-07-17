@@ -7,8 +7,8 @@ namespace DataStructures.BinaryTree
 {
     public class BinaryTree<T> : IDisposable where T : IComparable
     {
-        private BinaryTreeNode<T> root;
-        private int size;
+        protected BinaryTreeNode<T> root;
+        protected int size;
 
         public BinaryTree()
         {
@@ -25,6 +25,83 @@ namespace DataStructures.BinaryTree
         {
             get { return size; }
         }
+
+        public virtual void Clear()
+        {
+            Dispose();
+        }
+
+        public virtual void Dispose()
+        {
+            this.root = null;
+            size = 0;
+        }
+
+        public bool Contains(T item)
+        {
+            return FindNode(root, item) != null;
+        }
+
+        protected BinaryTreeNode<T> FindNextNode(BinaryTreeNode<T> node)
+        {
+            if (node.Right != null)
+            {
+                return LeftDescendant(node.Right);
+            }
+            else
+            {
+                return RightAncestor(node);
+            }
+        }
+
+        private BinaryTreeNode<T> RightAncestor(BinaryTreeNode<T> node)
+        {
+            if (node.Parent == null)
+            {
+                return null;
+            }
+            if (node.Data.CompareTo(node.Parent.Data) == -1)
+            {
+                return node.Parent;
+            }
+            return RightAncestor(node.Parent);
+        }
+
+        private BinaryTreeNode<T> LeftDescendant(BinaryTreeNode<T> node)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+            if (node.Left == null)
+            {
+                return node;
+            }
+            return LeftDescendant(node.Left);
+        }
+
+        protected BinaryTreeNode<T> FindNode(BinaryTreeNode<T> node, T item)
+        {
+            if (node == null)
+            {
+                return null;
+            }
+
+            if (node.Data.CompareTo(item) == 1)
+            {
+                return FindNode(node.Left, item);
+            }
+            else if (node.Data.CompareTo(item) == -1)
+            {
+                return FindNode(node.Right, item);
+            }
+            else
+            {
+                return node;
+            }
+        }
+
+        #region Insertion
 
         public virtual void Insert(T item)
         {
@@ -55,6 +132,7 @@ namespace DataStructures.BinaryTree
                     newNode.Parent = node;
                     node.Left = newNode;
                     size++;
+                    AdjustHeight(newNode);
                 }
             }
             else if (node.Data.CompareTo(item) == -1)
@@ -67,6 +145,7 @@ namespace DataStructures.BinaryTree
                     newNode.Parent = node;
                     node.Right = newNode;
                     size++;
+                    AdjustHeight(newNode);
                 }
             }
             else
@@ -75,161 +154,123 @@ namespace DataStructures.BinaryTree
             }
         }
 
-        public virtual void Clear()
+        protected void AdjustHeight(BinaryTreeNode<T> node)
         {
-            Dispose();
-        }
-
-        public virtual void Dispose()
-        {
-            this.root = null;
-            size = 0;
-        }
-
-        public bool Contains(T item)
-        {
-            return FindNode(root, item) != null;
-        }
-
-        public virtual void Remove(T item)
-        {
-            BinaryTreeNode<T> node = FindNode(root, item);
             if (node == null)
             {
                 return;
             }
-
-            if (node.Left == null && node.Right == null)
-            {
-                FirstDeletionCase(node);
-            }
-            else if (node.Left != null && node.Right == null)
-            {
-                SecondDeletionCaseLeft(node);
-            }
-            else if (node.Left == null && node.Right != null)
-            {
-                SecondDeletionCaseRight(node);
-            }
-            else
-            {
-                ThirdDeletionCase(node);
-            }
-            size--;
+            node.Height = Math.Max(node.LeftHeight, node.RightHeight) + 1;
+            AdjustHeight(node.Parent);
         }
 
-        private void ThirdDeletionCase(BinaryTreeNode<T> node)
+        #endregion
+
+        #region Deletion
+
+        public virtual void Remove(T item)
         {
-            BinaryTreeNode<T> nextNode = FindNextNode(node);
+            BinaryTreeNode<T> node = FindNode(root, item);
+            Remove(node);                       
+        }
+
+        protected virtual BinaryTreeNode<T> Remove(BinaryTreeNode<T> node)
+        {
+            BinaryTreeNode<T> replacedNode = null;
+            if (node == null)
+            {
+                return replacedNode;
+            }
+
+            if (NodeHasNoChildrens(node))
+            {
+                replacedNode = DeleteCaseNoChildrens(node);
+            }
+            else if (NodeHasOneChildren(node))
+            {
+                replacedNode = DeleteCaseOneChildren(node);
+            }
+            else if (NodeHasTwoChildrens(node))
+            {
+                replacedNode = DeleteCaseTwoChildrens(node);
+            }
+            size--;
+            return replacedNode;
+        }
+
+        private BinaryTreeNode<T> DeleteCaseTwoChildrens(BinaryTreeNode<T> node)
+        {
+            var nextNode = FindNextNode(node);
+
             node.Data = nextNode.Data;
-            if (nextNode == nextNode.Parent.Left)
+
+            if (nextNode.Parent != null && nextNode.Parent.Left == nextNode)
             {
                 nextNode.Parent.Left = null;
             }
-            else
+            else if (nextNode.Parent != null && nextNode.Parent.Right == nextNode)
             {
                 nextNode.Parent.Right = null;
             }
+            AdjustHeight(nextNode.Parent);
+            return nextNode.Parent;
         }
 
-        private void SecondDeletionCaseRight(BinaryTreeNode<T> node)
+        private BinaryTreeNode<T> DeleteCaseOneChildren(BinaryTreeNode<T> node)
         {
-            if (node == node.Parent.Left)
+            if (node.Left != null)
             {
-                node.Parent.Left = node.Right;
+                node.Data = node.Left.Data;
+                node.Right = node.Left.Right;
+                node.Left = node.Left.Left;
+                node.Left = null;
             }
-            else
+            else if (node.Right != null)
             {
-                node.Parent.Right = node.Right;
+                node.Data = node.Right.Data;
+                node.Left = node.Right.Left;
+                node.Right = node.Right.Right;
+                node.Right = null;
             }
+            AdjustHeight(node);
+
+            return node;
         }
 
-        private void SecondDeletionCaseLeft(BinaryTreeNode<T> node)
+        private BinaryTreeNode<T> DeleteCaseNoChildrens(BinaryTreeNode<T> node)
         {
-            if (node == node.Parent.Left)
-            {
-                node.Parent.Left = node.Left;
-            }
-            else
-            {
-                node.Parent.Right = node.Left;
-            }
-        }
-
-        private void FirstDeletionCase(BinaryTreeNode<T> node)
-        {
-            if (node.Parent != null && node == node.Parent.Left)
+            if (node.Parent != null && node.Parent.Left == node)
             {
                 node.Parent.Left = null;
             }
-            else if (node.Parent != null)
+            else if (node.Parent != null && node.Parent.Right == node)
             {
                 node.Parent.Right = null;
             }
-            else
+            AdjustHeight(node.Parent);
+            if (root == node)
             {
                 root = null;
             }
+            return node.Parent;
         }
 
-        protected BinaryTreeNode<T> FindNextNode(BinaryTreeNode<T> node)
+        private bool NodeHasTwoChildrens(BinaryTreeNode<T> node)
         {
-            if (node.Right != null)
-            {
-                return LeftDescendant(node.Right);
-            }
-            else
-            {
-                return RightAncestor(node);
-            }
+            return (node.Left != null && node.Right != null);
         }
 
-        private BinaryTreeNode<T> RightAncestor(BinaryTreeNode<T> node)
+        private bool NodeHasOneChildren(BinaryTreeNode<T> node)
         {
-            if(node.Parent == null)
-            {
-                return null;
-            }
-            if(node.Data.CompareTo(node.Parent.Data) == -1)
-            {
-                return node.Parent;
-            }
-            return RightAncestor(node.Parent);
+            return (node.Left == null && node.Right != null) || (node.Left != null && node.Right == null);
         }
 
-        private BinaryTreeNode<T> LeftDescendant(BinaryTreeNode<T> node)
+        private bool NodeHasNoChildrens(BinaryTreeNode<T> node)
         {
-            if(node == null)
-            {
-                return null;
-            }
-            if(node.Left == null)
-            {
-                return node;
-            }
-            return LeftDescendant(node.Left);
+            return node.Left == null && node.Right == null;
         }
 
-        protected BinaryTreeNode<T> FindNode(BinaryTreeNode<T> node, T item)
-        {
-            if (node == null)
-            {
-                return null;
-            }
-
-            if (node.Data.CompareTo(item) == 1)
-            {
-                return FindNode(node.Left, item);
-            }
-            else if (node.Data.CompareTo(item) == -1)
-            {
-                return FindNode(node.Right, item);
-            }
-            else
-            {
-                return node;
-            }
-        }
+        #endregion        
 
         #region TreeTraversal
 
@@ -294,7 +335,7 @@ namespace DataStructures.BinaryTree
             get
             {
                 return GetInOrderList()[index];
-            }            
+            }
         }
 
         #endregion
@@ -333,14 +374,14 @@ namespace DataStructures.BinaryTree
         {
             var rangeList = new List<T>();
 
-            if(IsEmpty())
+            if (IsEmpty())
             {
                 return rangeList;
             }
 
             var nodeTmp = FindNextCloseNode(root, min);
 
-            while(nodeTmp != null && nodeTmp.Data.CompareTo(max) != 1)
+            while (nodeTmp != null && nodeTmp.Data.CompareTo(max) != 1)
             {
                 rangeList.Add(nodeTmp.Data);
                 nodeTmp = FindNextNode(nodeTmp);
