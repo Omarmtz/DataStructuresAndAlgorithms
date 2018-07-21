@@ -4,21 +4,21 @@ using System.Text;
 
 namespace SortingAlgorithms.ComparisionAlgorithms
 {
-    public class MergeSort<T> : ISort<T> where T : IComparable
+    public class MergeSortAlgorithm<T> : ISort<T> where T : IComparable
     {
+        private readonly Comparison<T> _defaultCompareFunction = (a, b) => a.CompareTo(b);
+
         public void Sort(T[] array, Comparison<T> compareFunction)
         {
-            MergeSorting(array, 0, array.Length - 1, compareFunction);
+            MergeSort(array, 0, array.Length - 1, compareFunction);
         }
 
         public void Sort(T[] array)
         {
-            Comparison<T> defaultCompareFunction = (a, b) => a.CompareTo(b);
-
-            MergeSorting(array, 0, array.Length - 1, defaultCompareFunction);
+            MergeSort(array, 0, array.Length - 1, _defaultCompareFunction);
         }
 
-        private void MergeSorting(T[] array, int left, int right, Comparison<T> compareFunction)
+        private void MergeSort(T[] array, int left, int right, Comparison<T> compareFunction)
         {
             if (right <= left)
             {
@@ -27,8 +27,8 @@ namespace SortingAlgorithms.ComparisionAlgorithms
 
             //Divide
             var mid = (int)Math.Floor((left + right) / 2f);            
-            MergeSorting(array, left, mid, compareFunction);
-            MergeSorting(array, mid + 1, right, compareFunction);
+            MergeSort(array, left, mid, compareFunction);
+            MergeSort(array, mid + 1, right, compareFunction);
             //Merge (Conquer)                        
             Merge(array, left, mid, right, compareFunction);
         }
